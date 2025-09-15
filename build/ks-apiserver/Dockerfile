@@ -12,7 +12,10 @@ ENV GOPRIVATE=git.gaccloud.com.cn
 WORKDIR /workspace
 ADD . /workspace/
 
-RUN make ks-apiserver
+RUN --mount=type=cache,target=/root/.cache/go-build \
+    --mount=type=cache,target=/go/pkg/mod \
+    make ks-apiserver
+
 RUN mv /workspace/bin/cmd/ks-apiserver ${OUTDIR}/usr/local/bin/
 
 ##############

@@ -29,7 +29,10 @@ ENV GOPRIVATE=git.gaccloud.com.cn
 WORKDIR /workspace
 ADD . /workspace/
 
-RUN make ks-controller-manager
+RUN --mount=type=cache,target=/root/.cache/go-build \
+    --mount=type=cache,target=/go/pkg/mod \
+    make ks-controller-manager
+
 RUN mv /workspace/bin/cmd/controller-manager ${OUTDIR}/usr/local/bin/
 
 # Final Image
