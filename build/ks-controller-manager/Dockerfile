@@ -1,5 +1,9 @@
 # Download dependencies
-FROM alpine:3.22.1 AS base_os_context
+ARG ALPINE_IMAGE=alpine:3.22.1
+
+ARG GOLANG_IMAGE=golang:1.24.6
+
+FROM ${ALPINE_IMAGE} AS base_os_context
 
 RUN apk add --no-cache ca-certificates curl
 
@@ -16,7 +20,7 @@ RUN curl -LO ${TELEMETRY_URL}/v${TELEMETRY_VERSION}/telemetry_${TELEMETRY_VERSIO
 COPY config/ks-core ${OUTDIR}/var/helm-charts/ks-core
 
 # Build
-FROM golang:1.24.6 AS build_context
+FROM ${GOLANG_IMAGE} AS build_context
 
 ENV OUTDIR=/out
 RUN mkdir -p ${OUTDIR}/usr/local/bin/
@@ -36,7 +40,7 @@ RUN --mount=type=cache,target=/root/.cache/go-build \
 RUN mv /workspace/bin/cmd/controller-manager ${OUTDIR}/usr/local/bin/
 
 # Final Image
-FROM alpine:3.22.1
+FROM ${ALPINE_IMAGE}
 
 COPY --from=base_os_context /out/ /
 COPY --from=build_context /out/ /
